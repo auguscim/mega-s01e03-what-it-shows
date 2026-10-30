@@ -1,0 +1,32 @@
+---
+layout: runbook
+title: '#4471 · date reports split by cause'
+owner: Marek Auguścik
+status: proposed
+reviewed: 2026-10-30
+signature: Marek Auguścik
+---
+
+<script>
+  import IssueSplit from '#lib/kb/IssueSplit.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+#4471 was marked as one known date problem. The exported reports show two independent causes, so
+each now has its own engineering ticket.
+
+## What the export shows
+
+<IssueSplit
+  parserIssue="https://github.com/auguscim/mega-s01e03-what-it-shows/issues/1"
+  hintIssue="https://github.com/auguscim/mega-s01e03-what-it-shows/issues/2"
+/>
+
+## Why split it
+
+The parser error affects every report from a day-first tenant except booking-v3 form reports.
+The booking-v3 hint is a separate form problem: it tells people to enter a month-first date and
+then interprets that input in the tenant's day-first locale. One fix cannot safely stand in for the
+other.
+
+<RenderStamp {signature} />
