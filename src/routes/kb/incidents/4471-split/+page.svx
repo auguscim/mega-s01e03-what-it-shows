@@ -1,32 +1,63 @@
 ---
 layout: runbook
-title: '#4471 · date reports split by cause'
-owner: Marek Auguścik
+title: '#4471 · three problems, not one'
+owner: support desk
 status: proposed
-reviewed: 2026-10-30
-signature: Marek Auguścik
+reviewed: 2026-11-03
+signature: v1.eyJzdWIiOiIyNzEyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM2OTQzMDUsImV4cCI6MTc5Mzc4MDcwNX0.3aDva79fg0Z2UUZsvAzuS3wbbPtz-X4GYjWl8J3weGc
 ---
 
 <script>
-  import IssueSplit from '#lib/kb/IssueSplit.svelte';
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
   import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const repo = 'auguscim/mega-s01e03-what-it-shows';
+  const rows = {
+    parser: {
+      what: 'The shared parser reads day-first dates month first: day and month swap.',
+      issue: 1,
+      status: 'fixed (desk update, 05 Oct)',
+    },
+    hint: {
+      what: 'booking-v3 prints MM/DD/YYYY under the date field, then reads the date day first.',
+      issue: 2,
+      status: "won't fix: booking-v3 retired",
+    },
+    'day-shift': {
+      what: 'The date moves by one day, not a swap: invite and calendar disagree by a day, per time zone.',
+      issue: 3,
+      status: 'open, no fix queued',
+    },
+  };
 </script>
 
-#4471 was marked as one known date problem. The exported reports show two independent causes, so
-each now has its own engineering ticket.
+[#4471](/kb/incidents/4471) merged every report about wrong dates into one ticket, because their
+subject lines matched ([decision 0001](/kb/decisions/0001-dedupe-by-subject)). Read by what each
+report describes, the ticket holds three problems. Each now has its own ticket.
 
-## What the export shows
+<Callout kind="warn">
+#4471 is closed, but only two of its three problems are dealt with. The one-day shift has no fix.
+</Callout>
 
-<IssueSplit
-  parserIssue="https://github.com/auguscim/mega-s01e03-what-it-shows/issues/1"
-  hintIssue="https://github.com/auguscim/mega-s01e03-what-it-shows/issues/2"
-/>
+## What #4471 holds
 
-## Why split it
+<ProblemTable ticket={4471} {repo} {rows} />
 
-The parser error affects every report from a day-first tenant except booking-v3 form reports.
-The booking-v3 hint is a separate form problem: it tells people to enter a month-first date and
-then interprets that input in the tenant's day-first locale. One fix cannot safely stand in for the
-other.
+## How the reports were split
+
+- **One report, one count.** The export pages overlap, so some reports appear twice. Counted by id.
+- **Cause by tenant, not by intake tag.** Intake guesses `parser` or `hint` from the reporter's
+  browser. The cause depends on the tenant's locale and booking form (`causes.ts`).
+- **A one-day move is not a swap.** The desk read some reports as a one-day move
+  (`desk-notes.json`) but filed them under `parser` by tenant. A swapped day and month moves a
+  booking by months. These moved it by one day, differently for clients in different time zones,
+  and in one case only in June. The parser fix does not reach them.
+
+## What to watch
+
+- The parser fix covers "eu locales". Harbour Dental writes `en-GB`, which is not an EU locale:
+  check that its reports stop.
+- A new one-day report belongs to the day-shift ticket, not to #4471.
 
 <RenderStamp {signature} />

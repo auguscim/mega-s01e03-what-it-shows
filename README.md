@@ -34,3 +34,8 @@ Support desk. Decision records: whoever signed them.
 ---
 
 Exported 2026-10-04 from the `support` repo, `apps/kb/` → `src/`.
+
+## Build
+
+`npm install && npm run build` renders every page to `rendered/` (static HTML, as the desk sees it).
+The #4471 split: `src/routes/kb/incidents/4471-split/+page.svx` → `rendered/kb/incidents/4471-split.html`.
